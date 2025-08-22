@@ -23,6 +23,14 @@ export function JsonParser() {
     }
   }, [input])
 
+  const highlightJson = (jsonString: string) => {
+    return jsonString
+      .replace(/"([^"]+)":/g, '<span class="text-blue-600 dark:text-blue-400">"$1":</span>')
+      .replace(/:\s*"([^"]+)"/g, ': <span class="text-green-600 dark:text-green-400">"$1"</span>')
+      .replace(/:\s*(\d+)/g, ': <span class="text-purple-600 dark:text-purple-400">$1</span>')
+      .replace(/:\s*(true|false|null)/g, ': <span class="text-orange-600 dark:text-orange-400">$1</span>')
+  }
+
   const formatJson = () => {
     try {
       const parsed = JSON.parse(input)
@@ -83,12 +91,22 @@ export function JsonParser() {
               </Button>
             )}
           </div>
-          <Textarea
-            placeholder="Formatted JSON will appear here..."
-            value={output}
-            readOnly
-            className="min-h-[300px] font-mono text-sm"
-          />
+          {output && (
+            <div className="border rounded-md p-3 bg-muted/30 min-h-[300px] overflow-auto">
+              <pre
+                className="font-mono text-sm whitespace-pre-wrap"
+                dangerouslySetInnerHTML={{ __html: highlightJson(output) }}
+              />
+            </div>
+          )}
+          {!output && (
+            <Textarea
+              placeholder="Formatted JSON will appear here..."
+              value={output}
+              readOnly
+              className="min-h-[300px] font-mono text-sm"
+            />
+          )}
         </div>
       </div>
 

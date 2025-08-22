@@ -13,6 +13,27 @@ export function XmlParser() {
   const [error, setError] = useState("")
   const [copied, setCopied] = useState(false)
 
+  const highlightXml = (xml: string) => {
+    // First escape HTML entities to prevent XML from being rendered as HTML
+    const escaped = xml
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;")
+
+    // Apply syntax highlighting to the escaped content
+    return escaped
+      .replace(/(&lt;\/?[a-zA-Z0-9-_:]+)/g, '<span class="text-blue-600 dark:text-blue-400 font-semibold">$1</span>')
+      .replace(/(&gt;)/g, '<span class="text-blue-600 dark:text-blue-400">$1</span>')
+      .replace(
+        /([a-zA-Z0-9-_:]+)=(&quot;[^&]*?&quot;|&#39;[^&]*?&#39;)/g,
+        '<span class="text-orange-600 dark:text-orange-400">$1</span>=<span class="text-green-600 dark:text-green-400">$2</span>',
+      )
+      .replace(/(&lt;!--.*?--&gt;)/g, '<span class="text-gray-500 dark:text-gray-400 italic">$1</span>')
+      .replace(/(&lt;\?.*?\?&gt;)/g, '<span class="text-purple-600 dark:text-purple-400">$1</span>')
+  }
+
   const formatXml = () => {
     try {
       const parser = new DOMParser()
@@ -126,12 +147,22 @@ export function XmlParser() {
               </Button>
             )}
           </div>
-          <Textarea
-            placeholder="Formatted XML will appear here..."
-            value={output}
-            readOnly
-            className="min-h-[300px] font-mono text-sm"
-          />
+          {output && (
+            <div className="border rounded-md p-3 bg-muted/30 min-h-[300px] overflow-auto">
+              <pre
+                className="font-mono text-sm whitespace-pre-wrap"
+                dangerouslySetInnerHTML={{ __html: highlightXml(output) }}
+              />
+            </div>
+          )}
+          {!output && (
+            <Textarea
+              placeholder="Formatted XML will appear here..."
+              value={output}
+              readOnly
+              className="min-h-[300px] font-mono text-sm"
+            />
+          )}
         </div>
       </div>
 

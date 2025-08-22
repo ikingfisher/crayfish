@@ -13,6 +13,20 @@ export function YamlFormatter() {
   const [error, setError] = useState("")
   const [copied, setCopied] = useState(false)
 
+  const highlightYaml = (yaml: string) => {
+    return yaml
+      .replace(
+        /^(\s*)([a-zA-Z0-9_-]+)(\s*:)/gm,
+        '$1<span class="text-blue-600 dark:text-blue-400 font-medium">$2</span>$3',
+      )
+      .replace(/:\s*"([^"]*)"/g, ': <span class="text-green-600 dark:text-green-400">"$1"</span>')
+      .replace(/:\s*'([^']*)'/g, ": <span class=\"text-green-600 dark:text-green-400\">'$1'</span>")
+      .replace(/:\s*(\d+)$/gm, ': <span class="text-purple-600 dark:text-purple-400">$1</span>')
+      .replace(/:\s*(true|false|null)$/gm, ': <span class="text-orange-600 dark:text-orange-400">$1</span>')
+      .replace(/^(\s*)-\s*/gm, '$1<span class="text-red-600 dark:text-red-400">-</span> ')
+      .replace(/^(\s*)#(.*)$/gm, '$1<span class="text-gray-500 dark:text-gray-400 italic">#$2</span>')
+  }
+
   const formatYaml = () => {
     try {
       // Basic YAML formatting - normalize indentation and structure
@@ -148,12 +162,22 @@ skills:
               </Button>
             )}
           </div>
-          <Textarea
-            placeholder="Formatted output will appear here..."
-            value={output}
-            readOnly
-            className="min-h-[300px] font-mono text-sm"
-          />
+          {output && (
+            <div className="border rounded-md p-3 bg-muted/30 min-h-[300px] overflow-auto">
+              <pre
+                className="font-mono text-sm whitespace-pre-wrap"
+                dangerouslySetInnerHTML={{ __html: highlightYaml(output) }}
+              />
+            </div>
+          )}
+          {!output && (
+            <Textarea
+              placeholder="Formatted output will appear here..."
+              value={output}
+              readOnly
+              className="min-h-[300px] font-mono text-sm"
+            />
+          )}
         </div>
       </div>
 
