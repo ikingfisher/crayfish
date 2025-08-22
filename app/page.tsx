@@ -6,6 +6,7 @@ import { XmlParser } from "@/components/xml-parser"
 import { JwtDecoder } from "@/components/jwt-decoder"
 import { YamlFormatter } from "@/components/yaml-formatter"
 import { SqlFormatter } from "@/components/sql-formatter"
+import { TextDiff } from "@/components/text-diff"
 
 export default function Home() {
   return (
@@ -17,12 +18,13 @@ export default function Home() {
         </div>
 
         <Tabs defaultValue="json" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="json">JSON Parser</TabsTrigger>
             <TabsTrigger value="xml">XML Parser</TabsTrigger>
             <TabsTrigger value="jwt">JWT Decoder</TabsTrigger>
             <TabsTrigger value="yaml">YAML Format</TabsTrigger>
             <TabsTrigger value="sql">SQL Format</TabsTrigger>
+            <TabsTrigger value="diff">Text Diff</TabsTrigger>
           </TabsList>
 
           <TabsContent value="json" className="mt-6">
@@ -81,6 +83,20 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <SqlFormatter />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="diff" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Text Diff Tool</CardTitle>
+                <CardDescription>
+                  Compare two text blocks with syntax highlighting and line-by-line differences
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <TextDiff />
               </CardContent>
             </Card>
           </TabsContent>
