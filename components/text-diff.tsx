@@ -14,8 +14,8 @@ interface DiffLine {
 }
 
 interface SideBySideDiff {
-  leftLine: { content: string; type: "removed" | "unchanged" | "empty"; lineNumber: number }
-  rightLine: { content: string; type: "added" | "unchanged" | "empty"; lineNumber: number }
+  leftLine: { content: string; type: "removed" | "unchanged" | "empty"; lineNumber: number; diffContent?: string }
+  rightLine: { content: string; type: "added" | "unchanged" | "empty"; lineNumber: number; diffContent?: string }
 }
 
 export function TextDiff() {
@@ -49,16 +49,24 @@ export function TextDiff() {
           },
         })
       } else {
+        // Highlight differences within the line
+        const leftContent = leftLine || ""
+        const rightContent = rightLine || ""
+        const leftDiff = leftContent !== rightContent ? leftContent : ""
+        const rightDiff = rightContent !== leftContent ? rightContent : ""
+
         result.push({
           leftLine: {
-            content: leftLine || "",
-            type: leftLine ? "removed" : "empty",
+            content: leftContent,
+            type: leftContent ? "removed" : "empty",
             lineNumber: i + 1,
+            diffContent: leftDiff,
           },
           rightLine: {
-            content: rightLine || "",
-            type: rightLine ? "added" : "empty",
+            content: rightContent,
+            type: rightContent ? "added" : "empty",
             lineNumber: i + 1,
+            diffContent: rightDiff,
           },
         })
       }
@@ -191,7 +199,9 @@ export function TextDiff() {
                       <span
                         className="flex-1"
                         dangerouslySetInnerHTML={{
-                          __html: getSyntaxHighlighting(diff.leftLine.content, language),
+                          __html: diff.leftLine.diffContent
+                            ? getSyntaxHighlighting(diff.leftLine.content.replace(diff.leftLine.diffContent, `<span class="bg-yellow-100 dark:bg-yellow-900">${diff.leftLine.diffContent}</span>`), language)
+                            : getSyntaxHighlighting(diff.leftLine.content, language),
                         }}
                       />
                     </div>
@@ -221,7 +231,9 @@ export function TextDiff() {
                       <span
                         className="flex-1"
                         dangerouslySetInnerHTML={{
-                          __html: getSyntaxHighlighting(diff.rightLine.content, language),
+                          __html: diff.rightLine.diffContent
+                            ? getSyntaxHighlighting(diff.rightLine.content.replace(diff.rightLine.diffContent, `<span class="bg-yellow-100 dark:bg-yellow-900">${diff.rightLine.diffContent}</span>`), language)
+                            : getSyntaxHighlighting(diff.rightLine.content, language),
                         }}
                       />
                     </div>
